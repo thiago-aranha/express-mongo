@@ -1,7 +1,7 @@
 import express from "express";
 import connectLibraryDatabase from "./cfg/dbconnect.js";
-import homeRoutes from "./methods/homeMethod.js";
-import booksRoutes from "./methods/booksMethod.js";
+import homeRoutes from "./routes/homeRoutes.js";
+import booksRoutes from "./routes/bookRoutes.js";
 
 const connection = await connectLibraryDatabase();
 
