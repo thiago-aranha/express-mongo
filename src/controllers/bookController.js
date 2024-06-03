@@ -19,6 +19,16 @@ class BookController {
             res.status(500).json({message: `${error.message} - Failed to obtain book with id ${req.params.id}`})
         }
     };
+
+    static async getBooksByCompany (req, res) {
+        const searchedCompany = req.query.company;
+        try {
+            const booksByCompany = await book.find({ company: searchedCompany});
+            res.status(200).json(booksByCompany);
+        } catch (error) {
+            res.status(500).json({message: `${error.message} - Failed to obtain books from company ${searchedCompany}`})
+        }
+    }
     
     static async addBook (req, res) {
         try {
