@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { author, authorSchema } from "./authorModel.js";
 
 const bookSchema = new mongoose.Schema(
     {
@@ -6,7 +7,9 @@ const bookSchema = new mongoose.Schema(
         title: {type: String, required: true},
         company: {type: String},
         price: {type: Number},
-        pages: {type: Number} },
+        pages: {type: Number},
+        author: authorSchema
+     },
     { versionKey: false });
 
 const book = mongoose.model("books", bookSchema);
