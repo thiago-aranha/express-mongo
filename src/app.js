@@ -2,7 +2,8 @@ import express from "express";
 import connectLibraryDatabase from "./cfg/dbconnect.js";
 import homeRoutes from "./routes/homeRoutes.js";
 import booksRoutes from "./routes/bookRoutes.js";
-import authorRoutes from "./routes/authorRoutes.js"
+import authorRoutes from "./routes/authorRoutes.js";
+import errorHandler from "./middleware/errorHandler.js";
 
 const connection = await connectLibraryDatabase();
 
@@ -20,5 +21,7 @@ app.use(express.json());
 app.use('/', homeRoutes);
 app.use('/books', booksRoutes);
 app.use('/authors', authorRoutes);
+
+app.use(errorHandler);
 
 export default app;
