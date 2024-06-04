@@ -14,7 +14,11 @@ class BookController {
     static async getBookById (req, res, next) {
         try {
             const searchedBook = await book.findById(req.params.id);
-            res.status(200).json(searchedBook);
+            if (searchedBook !== null) {
+                res.status(200).json(searchedBook);
+            } else {
+                res.status(404).json({message: `Book ID not found ${req.params.id}`});
+            }
         } catch (error) {
             next(error);
         }
@@ -23,7 +27,7 @@ class BookController {
     static async getBooksByCompany (req, res, next) {
         const searchedCompany = req.query.company;
         try {
-            const booksByCompany = await book.find({ company: searchedCompany});
+            const booksByCompany = await book.find({company: searchedCompany});
             res.status(200).json(booksByCompany);
         } catch (error) {
             next(error);
@@ -43,8 +47,12 @@ class BookController {
     
     static async updateBook (req, res, next) {
         try {
-            await book.findByIdAndUpdate(req.params.id, req.body);
-            res.status(200).json({message: `Book ${req.params.id} successfully updated!`});
+            const updatedBook = await book.findByIdAndUpdate(req.params.id, req.body);
+            if (updatedBook !== null) {
+                res.status(200).json({message: `Book ${req.params.id} successfully updated!`});
+            } else {
+                res.status(404).json({message: `Book ID not found ${req.params.id}`});
+            }
         } catch (error) {
             next(error);
         }
@@ -52,8 +60,12 @@ class BookController {
 
     static async deleteBook (req, res, next) {
         try {
-            await book.findByIdAndDelete(req.params.id);
-            res.status(200).json({message: `Book ${req.params.id} successfully deleted!`});
+            const deletedBook = await book.findByIdAndDelete(req.params.id);
+            if (deletedBook !== null) {
+                res.status(200).json({message: `Book ${req.params.id} successfully deleted!`});
+            } else {
+                res.status(404).json({message: `Book ID not found ${req.params.id}`});
+            }
         } catch (error) {
             next(error);
         }
