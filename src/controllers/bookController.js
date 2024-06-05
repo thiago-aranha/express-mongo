@@ -36,8 +36,11 @@ class BookController {
     
     static async addBook (req, res, next) {
         try {
-            const searchedAuthor = await author.findById(req.body.author);
-            const bookWithAuthor = { ...req.body, author: { ...searchedAuthor._doc} }
+            let bookWithAuthor = req.body;
+            if (req.body.author !== null && req.body.author !== undefined) {
+                const searchedAuthor = await author.findById(req.body.author);
+                bookWithAuthor = { ...req.body, author: { ...searchedAuthor._doc} }
+            }
             const newBook = await book.create(bookWithAuthor);
             res.status(201).json({ message: "Book successfully created!", book: newBook});
         } catch (error) {
