@@ -1,11 +1,24 @@
 import book from "../models/bookModel.js";
 import { author } from "../models/authorModel.js";
+import invalidRequest from "../errors/invalidRequest.js";
+import pageNotFoundError from "../errors/pageNotFound.js";
 
 class BookController {
     static async getBooks (req, res, next) {
         try {
-            const bookList = await book.find({});
-            res.status(200).json(bookList);
+            let {limit = 5, page = 1} = req.query;
+            limit = parseInt(limit);
+            page = parseInt(page);
+
+            if (limit > 0 && page > 0) {
+                const bookList = await book.find({})
+                    .skip((page - 1) * limit)
+                    .limit(limit);
+    
+                res.status(200).json(bookList);
+            } else {
+                next(new invalidRequest());
+            }
         } catch (error) {
             next(error);
         }            
@@ -14,10 +27,10 @@ class BookController {
     static async getBookById (req, res, next) {
         try {
             const searchedBook = await book.findById(req.params.id);
-            if (searchedBook !== null) {
+            if (searchedBook) {
                 res.status(200).json(searchedBook);
             } else {
-                res.status(404).json({message: `Book ID not found ${req.params.id}`});
+                return next(new pageNotFoundError(`Book ID not found ${req.params.id}`));
             }
         } catch (error) {
             next(error);
@@ -59,10 +72,10 @@ class BookController {
     static async updateBook (req, res, next) {
         try {
             const updatedBook = await book.findByIdAndUpdate(req.params.id, req.body);
-            if (updatedBook !== null) {
+            if (updatedBook) {
                 res.status(200).json({message: `Book ${req.params.id} successfully updated!`});
             } else {
-                res.status(404).json({message: `Book ID not found ${req.params.id}`});
+                return next(new pageNotFoundError(`Book ID not found ${req.params.id}`));
             }
         } catch (error) {
             next(error);
@@ -72,10 +85,10 @@ class BookController {
     static async deleteBook (req, res, next) {
         try {
             const deletedBook = await book.findByIdAndDelete(req.params.id);
-            if (deletedBook !== null) {
+            if (deletedBook) {
                 res.status(200).json({message: `Book ${req.params.id} successfully deleted!`});
             } else {
-                res.status(404).json({message: `Book ID not found ${req.params.id}`});
+                return next(new pageNotFoundError(`Book ID not found ${req.params.id}`));
             }
         } catch (error) {
             next(error);

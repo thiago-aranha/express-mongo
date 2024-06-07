@@ -1,12 +1,17 @@
-import invalidRequest from "./invalidRequest.js";
+import baseError from "./baseError.js";
 
-class validationError extends invalidRequest{
-    constructor(error) {
-        const errorMsg = Object.values(error.errors)
-            .map(error => error.message)
-            .join("; ");
-    
-        super(`Validation error: ${errorMsg}`);
+class validationError extends baseError {
+    constructor(validationErrors, msg = "Validation error") {
+        super(msg, 422);
+        this.validationErrors = validationErrors;
+    }
+
+    sendResponse(res) {
+        res.status(this.status).json({
+            message: this.message,
+            status: this.status,
+            errors: this.validationErrors
+        });
     }
 }
 

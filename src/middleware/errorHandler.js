@@ -11,14 +11,21 @@ function pageNotFound(req, res, next) {
 
 function errorHandler(error, req, res, next) {
     if (error instanceof mongoose.Error.CastError) {
-        new invalidRequest().sendResponse(res);
+        const invalidReqError = new invalidRequest();
+        invalidReqError.sendResponse(res);
     } else if (error instanceof mongoose.Error.ValidationError) {
-        new validationError(error).sendResponse(res);
-    } else if (error instanceof pageNotFoundError) {
+        const validationErr = new validationError(error);
+        validationErr.sendResponse(res);
+    } else if (error instanceof invalidRequest) {
+        error.sendResponse(res);
+    } else if (error instanceof validationError) {
+        error.sendResponse(res);
+    } else if (error instanceof baseError) {
         error.sendResponse(res);
     } else {
-        new baseError().sendResponse(res);
+        const baseErr = new baseError();
+        baseErr.sendResponse(res);
     }
-};
+}
 
 export { errorHandler, pageNotFound };

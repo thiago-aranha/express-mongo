@@ -1,11 +1,24 @@
 import mongoose from "mongoose";
+import invalidRequest from "../errors/invalidRequest.js"
 import { author } from "../models/authorModel.js";
 
 class AuthorController {
     static async getAuthors (req, res, next) {
         try {
-            const authorList = await author.find({});
-            res.status(200).json(authorList);
+            let {limit = 5, page = 1} = req.query;
+            limit = parseInt(limit);
+            page = parseInt(page);
+
+            if (limit > 0 && page > 0) {
+                const authorList = await author.find({})
+                    .skip((page - 1) * limit)
+                    .limit(limit);
+    
+                res.status(200).json(authorList);
+            } else {
+                next(new invalidRequest());
+            }
+
         } catch (error) {
             next(error);
         }          
@@ -14,10 +27,10 @@ class AuthorController {
     static async getAuthorById (req, res, next) {
         try {
             const searchedAuthor = await author.findById(req.params.id);
-            if (searchedAuthor !== null) {
+            if (searchedAuthor) {
                 res.status(200).json(searchedAuthor);
             } else {
-                res.status(404).json({message: `Author ID not found ${req.params.id}`})
+                return next(new pageNotFoundError(`Author ID not found ${req.params.id}`));
             }
         } catch (error) {
             next(error);
@@ -36,10 +49,10 @@ class AuthorController {
     static async updateAuthor (req, res, next) {
         try {
             const updatedAuthor = await author.findByIdAndUpdate(req.params.id, req.body);
-            if (updatedAuthor !== null) {
+            if (updatedAuthor) {
                 res.status(200).json({message: `Author ${req.params.id} successfully updated!`});
             } else {
-                res.status(404).json({message: `Author ID not found ${req.params.id}`});
+                return next(new pageNotFoundError(`Author ID not found ${req.params.id}`));
             }
         } catch (error) {
             next(error);
@@ -49,10 +62,10 @@ class AuthorController {
     static async deleteAuthor (req, res, next) {
         try {
             const deletedAuthor = await author.findByIdAndDelete(req.params.id);
-            if (deletedAuthor !== null) {
+            if (deletedAuthor) {
                 res.status(200).json({message: `Author ${req.params.id} successfully deleted!`});
             } else {
-                res.status(404).json({message: `Author ID not found ${req.params.id}`});
+                return next(new pageNotFoundError(`Author ID not found ${req.params.id}`));
             }
         } catch (error) {
             next(error);
