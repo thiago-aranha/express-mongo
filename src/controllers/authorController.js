@@ -11,6 +11,7 @@ class AuthorController {
 
             if (limit > 0 && page > 0) {
                 const authorList = await author.find({})
+                    .sort({name: 1})
                     .skip((page - 1) * limit)
                     .limit(limit);
     

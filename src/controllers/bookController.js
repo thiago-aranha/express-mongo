@@ -12,6 +12,7 @@ class BookController {
 
             if (limit > 0 && page > 0) {
                 const bookList = await book.find({})
+                    .sort({title: 1})
                     .skip((page - 1) * limit)
                     .limit(limit);
     
