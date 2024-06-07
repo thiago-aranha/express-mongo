@@ -24,11 +24,19 @@ class BookController {
         }
     };
 
-    static async getBooksByCompany (req, res, next) {
-        const searchedCompany = req.query.company;
+    static async getBooksByFilter (req, res, next) {
         try {
-            const booksByCompany = await book.find({company: searchedCompany});
-            res.status(200).json(booksByCompany);
+            const {company, title, price, pages} = req.query;
+            const search = {};
+
+            if (company) search.company = new RegExp(company, "i");
+            if (title) search.title = new RegExp(title, "i");
+            if (price) search.price = price;
+            if (pages) search.pages = pages;
+
+            const booksReturned = await book.find(search);
+            res.status(200).json(booksReturned);
+
         } catch (error) {
             next(error);
         }
